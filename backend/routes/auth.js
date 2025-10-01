@@ -1,63 +1,47 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const router = express.Router();
-const mysql = require("mysql2/promise");
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME
-});
+module.exports = (pool) => {
+  const router = express.Router();
 
-// REGISTER
-router.post("/register", async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+  // REGISTER
+  router.post("/register", async (req, res) => {
+    try {
+      const { name, email, password } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    // hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+      await pool.query(
+        "INSERT INTO User (name, email, password) VALUES (?, ?, ?)",
+        [name, email, hashedPassword]
+      );
 
-    const [result] = await db.query(
-      "INSERT INTO User (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword]
-    );
-
-    res.status(201).json({ message: "User registered!" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // check if user exists
-    const [users] = await db.query("SELECT * FROM User WHERE email = ?", [email]);
-    if (users.length === 0) {
-      return res.status(400).json({ message: "User not found" });
+      res.status(201).json({ message: "User registered!" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
     }
+  });
 
-    const user = users[0];
+  // LOGIN
+  router.post("/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const [rows] = await pool.query("SELECT * FROM User WHERE email = ?", [email]);
 
-    // compare entered password with hashed password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      if (rows.length === 0) return res.status(400).json({ message: "User not found" });
+
+      const user = rows[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+
+      const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+      res.json({ message: "Login successful", token });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
     }
+  });
 
-    // generate token
-    const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
-    res.json({ message: "Login successful", token });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-
-module.exports = router;
+  return router;
+};

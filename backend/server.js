@@ -1,28 +1,24 @@
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise"); // promise version
 const cors = require("cors");
 require("dotenv").config();
-const authRoutes = require("./routes/auth");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/api/auth", authRoutes);
 
-// DB Connection
-const db = mysql.createConnection({
+// Create MySQL pool **first**
+const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASS || "",
   database: process.env.DB_NAME || "cricpulz"
 });
 
-db.connect(err => {
-  if (err) throw err;
-  console.log("✅ MySQL Connected...");
-});
+// Then pass pool to auth routes
+const authRoutes = require("./routes/auth")(pool);
+app.use("/api/auth", authRoutes);
 
-// Routes
 app.get("/", (req, res) => res.send("API Running..."));
 
 const PORT = process.env.PORT || 5000;
