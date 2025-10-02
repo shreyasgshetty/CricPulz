@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+
 
 export default function AdminLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -11,10 +13,10 @@ export default function AdminLogin() {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/admin-login", form);
       localStorage.setItem("adminToken", res.data.token);
-      alert("✅ Admin login successful!");
+      toast.success("Admin Login successfull!", { duration: 4000 });
       navigate("/admin-dashboard"); // redirect to admin area
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed", { duration: 4000 });
     }
   };
 

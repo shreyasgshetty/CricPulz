@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -10,10 +12,10 @@ export default function Register() {
     e.preventDefault();
     try {
       await axios.post("http://localhost:5000/api/auth/register", form);
-      alert("✅ Registered successfully!");
+      toast.success("✅ Registered successfully!", { duration: 4000 });
       navigate("/login");
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Registration failed", { duration: 4000 });
     }
   };
 
