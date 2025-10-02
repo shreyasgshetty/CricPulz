@@ -72,5 +72,37 @@ router.post("/admin-login", async (req, res) => {
   }
 });
 
+// EMPLOYEE LOGIN
+router.post("/employee-login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // find user by email
+    const [rows] = await pool.query("SELECT * FROM user WHERE email = ?", [email]);
+    if (rows.length === 0) return res.status(400).json({ message: "User not found" });
+
+    const user = rows[0];
+
+    // check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+
+    // check if user is an employee
+    const [employees] = await pool.query("SELECT * FROM employee WHERE user_id = ?", [user.user_id]);
+    if (employees.length === 0) return res.status(403).json({ message: "Not an employee" });
+
+    // generate JWT
+    const token = jwt.sign({ id: user.user_id, role: "employee" }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({ message: "Employee login successful", token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
   return router;
 };
