@@ -43,5 +43,34 @@ module.exports = (pool) => {
     }
   });
 
+  // ADMIN LOGIN
+router.post("/admin-login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // check user
+    const [rows] = await pool.query("SELECT * FROM User WHERE email = ?", [email]);
+    if (rows.length === 0) return res.status(400).json({ message: "User not found" });
+
+    const user = rows[0];
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+
+    // check if user is an admin
+    const [admins] = await pool.query("SELECT * FROM admin WHERE user_id = ?", [user.user_id]);
+    if (admins.length === 0) return res.status(403).json({ message: "Not an admin" });
+
+    // generate token
+    const token = jwt.sign({ id: user.user_id, role: "admin" }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({ message: "Admin login successful", token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
   return router;
 };
