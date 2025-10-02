@@ -2,8 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-import { toast } from "react-hot-toast";
-
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
@@ -13,11 +11,11 @@ export default function Login() {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", form);
       localStorage.setItem("token", res.data.token);
-
-      toast.success("Login successfull!", { duration: 4000 });
+      alert("✅ Login successful!");
       navigate("/");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed", { duration: 4000 });
+      alert(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
@@ -58,5 +56,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
 }
