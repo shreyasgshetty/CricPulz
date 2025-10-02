@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
 import { toast } from "react-hot-toast";
 
 
 export default function EmployeeLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
+=======
+
+export default function EmployeeLogin() {
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [message, setMessage] = useState("");
+>>>>>>> parent of b4a6499 (nn)
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,10 +20,17 @@ export default function EmployeeLogin() {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/employee-login", form);
       localStorage.setItem("employeeToken", res.data.token);
+<<<<<<< HEAD
       toast.success("Employee Login successfull!", { duration: 4000 });
       navigate("/employee-dashboard"); // redirect to employee area
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed", { duration: 4000 });
+=======
+      alert("✅ Employee login successful!");
+      navigate("/employee-dashboard"); // redirect to employee area
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Login failed");
+>>>>>>> parent of b4a6499 (nn)
     }
   };
 
@@ -26,6 +40,12 @@ export default function EmployeeLogin() {
         <h1 className="text-3xl font-extrabold mb-8 text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
           Employee Login
         </h1>
+<<<<<<< HEAD
+=======
+
+        {message && <p className="text-center mb-4 text-red-500">{message}</p>}
+
+>>>>>>> parent of b4a6499 (nn)
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
             type="email"
