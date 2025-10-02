@@ -1,6 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+<<<<<<< HEAD
+=======
+import { toast } from "react-hot-toast";
+
+>>>>>>> 79857f564d784263d3bed131a4a666696b1a1172
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -11,10 +16,17 @@ export default function Login() {
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", form);
       localStorage.setItem("token", res.data.token);
+<<<<<<< HEAD
       alert("✅ Login successful!");
       navigate("/");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
+=======
+      toast.success("Login successfull!", { duration: 4000 });
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Login failed", { duration: 4000 });
+>>>>>>> 79857f564d784263d3bed131a4a666696b1a1172
     }
   };
 
