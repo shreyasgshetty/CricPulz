@@ -19,6 +19,9 @@ const pool = mysql.createPool({
 const authRoutes = require("./routes/auth")(pool);
 app.use("/api/auth", authRoutes);
 
+const adminRoutes = require("./routes/admin")(pool);
+app.use("/api/admin", adminRoutes);
+
 app.get("/", (req, res) => res.send("API Running..."));
 
 const PORT = process.env.PORT || 5000;
