@@ -199,5 +199,55 @@ module.exports = (pool) => {
     }
   });
 
+  // ---- Tournament CRUD ----
+router.get("/tournaments", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM tournaments ORDER BY start_date DESC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching tournaments:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/tournaments", async (req, res) => {
+  try {
+    const { name, type, start_date, end_date, host_country } = req.body;
+    await pool.query(
+      "INSERT INTO tournaments (name, type, start_date, end_date, host_country) VALUES (?, ?, ?, ?, ?)",
+      [name, type, start_date || null, end_date || null, host_country]
+    );
+    res.json({ message: "Tournament created successfully" });
+  } catch (err) {
+    console.error("Error creating tournament:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.put("/tournaments/:id", async (req, res) => {
+  try {
+    const { name, type, start_date, end_date, host_country } = req.body;
+    await pool.query(
+      "UPDATE tournaments SET name=?, type=?, start_date=?, end_date=?, host_country=? WHERE tournament_id=?",
+      [name, type, start_date || null, end_date || null, host_country, req.params.id]
+    );
+    res.json({ message: "Tournament updated successfully" });
+  } catch (err) {
+    console.error("Error updating tournament:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.delete("/tournaments/:id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM tournaments WHERE tournament_id = ?", [req.params.id]);
+    res.json({ message: "Tournament deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting tournament:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
   return router;
 };

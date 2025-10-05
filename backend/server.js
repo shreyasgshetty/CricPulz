@@ -21,6 +21,8 @@ app.use("/api/auth", authRoutes);
 
 const adminRoutes = require("./routes/admin")(pool);
 app.use("/api/admin", adminRoutes);
+const cricketRoutes = require("./routes/cricket"); // adjust path if needed
+app.use("/api/cricket", cricketRoutes);
 
 app.get("/", (req, res) => res.send("API Running..."));
 
