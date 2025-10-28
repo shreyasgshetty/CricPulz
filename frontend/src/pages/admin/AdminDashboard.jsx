@@ -80,7 +80,7 @@ export default function AdminDashboard() {
   const handleTournamentCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/tournament", formTournament, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5000/api/admin/tournaments", formTournament, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Tournament created");
       setFormTournament({ name: "", type: "", start_date: "", end_date: "", host_country: "" });
       fetchDashboard();
@@ -152,11 +152,11 @@ export default function AdminDashboard() {
               </select>
               <select value={formMatch.team1_id} onChange={e=>setFormMatch({...formMatch,team1_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Team 1</option>
-                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
+                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
               </select>
               <select value={formMatch.team2_id} onChange={e=>setFormMatch({...formMatch,team2_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Team 2</option>
-                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
+                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
               </select>
               <button className="w-full py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded">Create Match</button>
             </form>
