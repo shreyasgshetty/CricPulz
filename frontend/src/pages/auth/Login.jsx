@@ -9,7 +9,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
+      const res = await axios.post("http://localhost:5003/api/auth/login", form);
       localStorage.setItem("token", res.data.token);
       alert("✅ Login successful!");
       navigate("/");

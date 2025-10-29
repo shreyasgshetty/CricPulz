@@ -13,11 +13,40 @@ export default function AdminDashboard() {
     pendingNews: []
   });
 
-  const [formSeries, setFormSeries] = useState({ name: "", format: "", type: "", start_date: "", end_date: "", host_country: "" });
-  const [formTeam, setFormTeam] = useState({ team_name: "", country: "", gender: "male", logo_url: "", type: "" });
-  const [formMatch, setFormMatch] = useState({ series_id: "", team1_id: "", team2_id: "", venue_id: "" });
-  const [formTournament, setFormTournament] = useState({ name: "", type: "", start_date: "", end_date: "", host_country: "" });
-  const [assignForm, setAssignForm] = useState({ employee_id: "", target_type: "match", target_id: "", role: "" });
+  const [formSeries, setFormSeries] = useState({
+    name: "",
+    format: "",
+    type: "",
+    start_date: "",
+    end_date: "",
+    host_country: ""
+  });
+  const [formTeam, setFormTeam] = useState({
+    team_name: "",
+    country: "",
+    gender: "male",
+    logo_url: "",
+    type: ""
+  });
+  const [formMatch, setFormMatch] = useState({
+    series_id: "",
+    team1_id: "",
+    team2_id: "",
+    venue_id: ""
+  });
+  const [formTournament, setFormTournament] = useState({
+    name: "",
+    type: "",
+    start_date: "",
+    end_date: "",
+    host_country: ""
+  });
+  const [assignForm, setAssignForm] = useState({
+    employee_id: "",
+    target_type: "match",
+    target_id: "",
+    role: ""
+  });
 
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
@@ -34,10 +63,10 @@ export default function AdminDashboard() {
 
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/dashboard", {
+      const res = await axios.get("http://localhost:5003/api/admin/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const tourRes = await axios.get("http://localhost:5000/api/admin/tournaments", {
+      const tourRes = await axios.get("http://localhost:5003/api/admin/tournaments", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setData({ ...res.data, tournaments: tourRes.data });
@@ -47,10 +76,11 @@ export default function AdminDashboard() {
     }
   };
 
+  // CRUD handlers
   const handleSeriesCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/series", formSeries, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/series", formSeries, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Series created");
       setFormSeries({ name: "", format: "", type: "", start_date: "", end_date: "", host_country: "" });
       fetchDashboard();
@@ -60,7 +90,7 @@ export default function AdminDashboard() {
   const handleTeamCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/team", formTeam, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/team", formTeam, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Team created");
       setFormTeam({ team_name: "", country: "", gender: "male", logo_url: "", type: "" });
       fetchDashboard();
@@ -70,7 +100,7 @@ export default function AdminDashboard() {
   const handleMatchCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/match", formMatch, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/match", formMatch, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Match created");
       setFormMatch({ series_id: "", team1_id: "", team2_id: "", venue_id: "" });
       fetchDashboard();
@@ -80,7 +110,7 @@ export default function AdminDashboard() {
   const handleTournamentCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/tournament", formTournament, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/tournaments", formTournament, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Tournament created");
       setFormTournament({ name: "", type: "", start_date: "", end_date: "", host_country: "" });
       fetchDashboard();
@@ -90,7 +120,7 @@ export default function AdminDashboard() {
   const handleAssign = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/admin/assign", assignForm, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/assign", assignForm, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Employee assigned");
       setAssignForm({ employee_id: "", target_type: "match", target_id: "", role: "" });
     } catch (err) { toast.error(err.response?.data?.message || "Assign failed"); }
@@ -98,7 +128,7 @@ export default function AdminDashboard() {
 
   const approveNews = async (id) => {
     try {
-      await axios.post(`http://localhost:5000/api/admin/news/${id}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`http://localhost:5003/api/admin/news/${id}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("News approved");
       fetchDashboard();
     } catch (err) { toast.error("Approve failed"); }
@@ -107,7 +137,7 @@ export default function AdminDashboard() {
   const rejectNews = async (id) => {
     const reason = prompt("Reason for rejection (optional):");
     try {
-      await axios.post(`http://localhost:5000/api/admin/news/${id}/reject`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`http://localhost:5003/api/admin/news/${id}/reject`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("News rejected");
       fetchDashboard();
     } catch (err) { toast.error("Reject failed"); }
@@ -119,30 +149,56 @@ export default function AdminDashboard() {
         <h1 className="text-4xl font-bold text-center mb-8">Admin Dashboard</h1>
 
         <div className="grid md:grid-cols-4 gap-6 mb-8">
-          {/* Series */}
+
+          {/* --- Series --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Series</h3>
             <form onSubmit={handleSeriesCreate} className="space-y-3">
               <input value={formSeries.name} onChange={e=>setFormSeries({...formSeries,name:e.target.value})} placeholder="Series Name" className="w-full p-2 rounded bg-gray-700"/>
-              <input value={formSeries.format} onChange={e=>setFormSeries({...formSeries,format:e.target.value})} placeholder="Format (ODI/T20/Test)" className="w-full p-2 rounded bg-gray-700"/>
-              <input value={formSeries.type} onChange={e=>setFormSeries({...formSeries,type:e.target.value})} placeholder="Type (league/friendly)" className="w-full p-2 rounded bg-gray-700"/>
+
+              <select value={formSeries.format} onChange={e=>setFormSeries({...formSeries,format:e.target.value})} className="w-full p-2 rounded bg-gray-700">
+                <option value="">Select Format</option>
+                <option value="ODI">ODI</option>
+                <option value="T20">T20</option>
+                <option value="Test">Test</option>
+              </select>
+
+              <select value={formSeries.type} onChange={e=>setFormSeries({...formSeries,type:e.target.value})} className="w-full p-2 rounded bg-gray-700">
+                <option value="">Select Type</option>
+                <option value="International">International</option>
+                <option value="Domestic">Domestic</option>
+                <option value="Franchise">Franchise</option>
+              </select>
+
               <input value={formSeries.host_country} onChange={e=>setFormSeries({...formSeries,host_country:e.target.value})} placeholder="Host Country" className="w-full p-2 rounded bg-gray-700"/>
               <button className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded">Create</button>
             </form>
           </div>
 
-          {/* Team */}
+          {/* --- Team --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Team / Franchise</h3>
             <form onSubmit={handleTeamCreate} className="space-y-3">
               <input value={formTeam.team_name} onChange={e=>setFormTeam({...formTeam,team_name:e.target.value})} placeholder="Team Name" className="w-full p-2 rounded bg-gray-700"/>
               <input value={formTeam.country} onChange={e=>setFormTeam({...formTeam,country:e.target.value})} placeholder="Country" className="w-full p-2 rounded bg-gray-700"/>
-              <input value={formTeam.type} onChange={e=>setFormTeam({...formTeam,type:e.target.value})} placeholder="Type (franchise/national)" className="w-full p-2 rounded bg-gray-700"/>
+
+              <select value={formTeam.gender} onChange={e=>setFormTeam({...formTeam,gender:e.target.value})} className="w-full p-2 rounded bg-gray-700">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+
+              <select value={formTeam.type} onChange={e=>setFormTeam({...formTeam,type:e.target.value})} className="w-full p-2 rounded bg-gray-700">
+                <option value="">Select Type</option>
+                <option value="National">National</option>
+                <option value="Franchise">Franchise</option>
+                <option value="Club">Club</option>
+              </select>
+
               <button className="w-full py-2 bg-gradient-to-r from-green-500 to-teal-500 rounded">Create Team</button>
             </form>
           </div>
 
-          {/* Match */}
+          {/* --- Match --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Match</h3>
             <form onSubmit={handleMatchCreate} className="space-y-3">
@@ -150,24 +206,34 @@ export default function AdminDashboard() {
                 <option value="">Select Series</option>
                 {data.series.map(s => <option key={s.series_id} value={s.series_id}>{s.name}</option>)}
               </select>
+
               <select value={formMatch.team1_id} onChange={e=>setFormMatch({...formMatch,team1_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Team 1</option>
-                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
+                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
               </select>
+
               <select value={formMatch.team2_id} onChange={e=>setFormMatch({...formMatch,team2_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Team 2</option>
-                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.team_name}</option>)}
+                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
               </select>
+
               <button className="w-full py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded">Create Match</button>
             </form>
           </div>
 
-          {/* Tournament */}
+          {/* --- Tournament --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Tournament</h3>
             <form onSubmit={handleTournamentCreate} className="space-y-3">
               <input value={formTournament.name} onChange={e=>setFormTournament({...formTournament,name:e.target.value})} placeholder="Tournament Name" className="w-full p-2 rounded bg-gray-700"/>
-              <input value={formTournament.type} onChange={e=>setFormTournament({...formTournament,type:e.target.value})} placeholder="Type (knockout/league)" className="w-full p-2 rounded bg-gray-700"/>
+
+              <select value={formTournament.type} onChange={e=>setFormTournament({...formTournament,type:e.target.value})} className="w-full p-2 rounded bg-gray-700">
+                <option value="">Select Type</option>
+                <option value="League">League</option>
+                <option value="Knockout">Knockout</option>
+                <option value="Bilateral">Bilateral</option>
+              </select>
+
               <input type="date" value={formTournament.start_date} onChange={e=>setFormTournament({...formTournament,start_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
               <input type="date" value={formTournament.end_date} onChange={e=>setFormTournament({...formTournament,end_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
               <input value={formTournament.host_country} onChange={e=>setFormTournament({...formTournament,host_country:e.target.value})} placeholder="Host Country" className="w-full p-2 rounded bg-gray-700"/>
@@ -176,7 +242,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Employee Assign + Pending News */}
+        {/* --- Employee Assignment & Pending News --- */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-2xl mb-4">Assign Employee</h3>
@@ -185,6 +251,7 @@ export default function AdminDashboard() {
                 <option value="">Select Employee</option>
                 {data.employees.map(emp => <option key={emp.employee_id} value={emp.employee_id}>{emp.name} ({emp.email})</option>)}
               </select>
+
               <select value={assignForm.target_type} onChange={e=>setAssignForm({...assignForm,target_type:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="match">Match</option>
                 <option value="series">Series</option>
@@ -193,12 +260,14 @@ export default function AdminDashboard() {
                 <option value="player">Player</option>
                 <option value="ranking">Ranking</option>
               </select>
+
               <input value={assignForm.target_id} onChange={e=>setAssignForm({...assignForm,target_id:e.target.value})} placeholder="Target ID (numeric)" className="w-full p-2 rounded bg-gray-700"/>
               <input value={assignForm.role} onChange={e=>setAssignForm({...assignForm,role:e.target.value})} placeholder="Role (e.g. scorer, manager)" className="w-full p-2 rounded bg-gray-700"/>
               <button className="w-full py-2 bg-gradient-to-r from-indigo-500 to-blue-500 rounded">Assign</button>
             </form>
           </div>
 
+          {/* --- Pending News --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-2xl mb-4">Pending News / Articles</h3>
             {data.pendingNews.length ? data.pendingNews.map(n => (
@@ -214,6 +283,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* --- Manage Buttons --- */}
         <div className="mt-8 text-center">
           <button onClick={()=>navigate("/manage-teams")} className="mr-4 px-4 py-2 bg-purple-600 rounded">Manage Teams</button>
           <button onClick={()=>navigate("/manage-players")} className="mr-4 px-4 py-2 bg-blue-600 rounded">Manage Players</button>
