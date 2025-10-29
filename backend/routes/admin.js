@@ -148,19 +148,23 @@ router.post("/team", async (req, res) => {
   });
 
   // ================= ASSIGN EMPLOYEE =================
-  router.post("/assign", async (req, res) => {
-    try {
-      const { employee_id, target_type, target_id, role } = req.body;
-      await pool.query(
-        "INSERT INTO employee_assignments (employee_id, target_type, target_id, role) VALUES (?, ?, ?, ?)",
-        [employee_id, target_type, target_id, role || null]
-      );
-      res.json({ message: "Employee assigned" });
-    } catch (err) {
-      console.error("Assign employee error:", err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
+router.post("/assign", async (req, res) => {
+  try {
+    const { employee_id, target_type, target_id, role } = req.body;
+    console.log("🟩 Assign Request Data:", req.body);
+
+    await pool.query(
+      "INSERT INTO employee_assignments (employee_id, target_type, target_id, role) VALUES (?, ?, ?, ?)",
+      [employee_id, target_type, target_id, role || null]
+    );
+
+    res.json({ message: "Employee assigned" });
+  } catch (err) {
+    console.error("Assign employee error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
   // ================= NEWS APPROVAL =================
   router.get("/pending-news", async (req, res) => {

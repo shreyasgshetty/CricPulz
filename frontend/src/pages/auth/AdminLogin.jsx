@@ -9,7 +9,7 @@ export default function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/admin-login", form);
+      const res = await axios.post("http://localhost:5003/api/auth/admin-login", form);
       localStorage.setItem("adminToken", res.data.token);
       alert("✅ Admin login successful!");
       navigate("/admin-dashboard"); // redirect to admin area

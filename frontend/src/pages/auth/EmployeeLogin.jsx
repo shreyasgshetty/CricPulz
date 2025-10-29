@@ -10,7 +10,7 @@ export default function EmployeeLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/employee-login", form);
+      const res = await axios.post("http://localhost:5003/api/auth/employee-login", form);
       localStorage.setItem("employeeToken", res.data.token);
       alert("✅ Employee login successful!");
       navigate("/employee-dashboard"); // redirect to employee area
