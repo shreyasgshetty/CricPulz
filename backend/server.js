@@ -24,6 +24,10 @@ app.use("/api/admin", adminRoutes);
 const cricketRoutes = require("./routes/cricket"); // adjust path if needed
 app.use("/api/cricket", cricketRoutes);
 
+const publicRoutes = require("./routes/public")(pool);
+app.use("/api/public", publicRoutes);
+
+
 app.get("/", (req, res) => res.send("API Running..."));
 
 const PORT = process.env.PORT || 5003;

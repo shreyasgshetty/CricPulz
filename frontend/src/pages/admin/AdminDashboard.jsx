@@ -21,6 +21,7 @@ export default function AdminDashboard() {
     end_date: "",
     host_country: ""
   });
+
   const [formTeam, setFormTeam] = useState({
     team_name: "",
     country: "",
@@ -28,12 +29,16 @@ export default function AdminDashboard() {
     logo_url: "",
     type: ""
   });
+
   const [formMatch, setFormMatch] = useState({
     series_id: "",
     team1_id: "",
     team2_id: "",
-    venue_id: ""
+    venue_id: "",
+    match_date: "",
+    start_time: ""
   });
+
   const [formTournament, setFormTournament] = useState({
     name: "",
     type: "",
@@ -41,6 +46,7 @@ export default function AdminDashboard() {
     end_date: "",
     host_country: ""
   });
+
   const [assignForm, setAssignForm] = useState({
     employee_id: "",
     target_type: "match",
@@ -80,67 +86,125 @@ export default function AdminDashboard() {
   const handleSeriesCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5003/api/admin/series", formSeries, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/series", formSeries, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Series created");
-      setFormSeries({ name: "", format: "", type: "", start_date: "", end_date: "", host_country: "" });
+      setFormSeries({
+        name: "",
+        format: "",
+        type: "",
+        start_date: "",
+        end_date: "",
+        host_country: ""
+      });
       fetchDashboard();
-    } catch (err) { toast.error(err.response?.data?.message || "Create failed"); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Create failed");
+    }
   };
 
   const handleTeamCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5003/api/admin/team", formTeam, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/team", formTeam, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Team created");
-      setFormTeam({ team_name: "", country: "", gender: "male", logo_url: "", type: "" });
+      setFormTeam({
+        team_name: "",
+        country: "",
+        gender: "male",
+        logo_url: "",
+        type: ""
+      });
       fetchDashboard();
-    } catch (err) { toast.error(err.response?.data?.message || "Create failed"); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Create failed");
+    }
   };
 
   const handleMatchCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5003/api/admin/match", formMatch, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/match", formMatch, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Match created");
-      setFormMatch({ series_id: "", team1_id: "", team2_id: "", venue_id: "" });
+      setFormMatch({
+        series_id: "",
+        team1_id: "",
+        team2_id: "",
+        venue_id: "",
+        match_date: "",
+        start_time: ""
+      });
       fetchDashboard();
-    } catch (err) { toast.error(err.response?.data?.message || "Create failed"); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Create failed");
+    }
   };
 
   const handleTournamentCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5003/api/admin/tournaments", formTournament, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/tournaments", formTournament, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Tournament created");
-      setFormTournament({ name: "", type: "", start_date: "", end_date: "", host_country: "" });
+      setFormTournament({
+        name: "",
+        type: "",
+        start_date: "",
+        end_date: "",
+        host_country: ""
+      });
       fetchDashboard();
-    } catch (err) { toast.error(err.response?.data?.message || "Create failed"); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Create failed");
+    }
   };
 
   const handleAssign = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5003/api/admin/assign", assignForm, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post("http://localhost:5003/api/admin/assign", assignForm, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Employee assigned");
       setAssignForm({ employee_id: "", target_type: "match", target_id: "", role: "" });
-    } catch (err) { toast.error(err.response?.data?.message || "Assign failed"); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Assign failed");
+    }
   };
 
   const approveNews = async (id) => {
     try {
-      await axios.post(`http://localhost:5003/api/admin/news/${id}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(
+        `http://localhost:5003/api/admin/news/${id}/approve`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       toast.success("News approved");
       fetchDashboard();
-    } catch (err) { toast.error("Approve failed"); }
+    } catch (err) {
+      toast.error("Approve failed");
+    }
   };
 
   const rejectNews = async (id) => {
     const reason = prompt("Reason for rejection (optional):");
     try {
-      await axios.post(`http://localhost:5003/api/admin/news/${id}/reject`, { reason }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(
+        `http://localhost:5003/api/admin/news/${id}/reject`,
+        { reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       toast.success("News rejected");
       fetchDashboard();
-    } catch (err) { toast.error("Reject failed"); }
+    } catch (err) {
+      toast.error("Reject failed");
+    }
   };
 
   return (
@@ -170,6 +234,8 @@ export default function AdminDashboard() {
                 <option value="Franchise">Franchise</option>
               </select>
 
+              <input type="date" value={formSeries.start_date} onChange={e=>setFormSeries({...formSeries,start_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
+              <input type="date" value={formSeries.end_date} onChange={e=>setFormSeries({...formSeries,end_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
               <input value={formSeries.host_country} onChange={e=>setFormSeries({...formSeries,host_country:e.target.value})} placeholder="Host Country" className="w-full p-2 rounded bg-gray-700"/>
               <button className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded">Create</button>
             </form>
@@ -217,6 +283,9 @@ export default function AdminDashboard() {
                 {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
               </select>
 
+              <input type="date" value={formMatch.match_date} onChange={e=>setFormMatch({...formMatch,match_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
+              <input type="time" value={formMatch.start_time} onChange={e=>setFormMatch({...formMatch,start_time:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
+              
               <button className="w-full py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded">Create Match</button>
             </form>
           </div>
