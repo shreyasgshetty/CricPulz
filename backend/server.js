@@ -27,6 +27,11 @@ app.use("/api/cricket", cricketRoutes);
 const publicRoutes = require("./routes/public")(pool);
 app.use("/api/public", publicRoutes);
 
+const rankingRoutes = require("./routes/Ranking")(pool);
+app.use("/api/rankings", rankingRoutes);
+
+const newsRoutes = require("./routes/News")(pool);
+app.use("/api/news", newsRoutes);
 
 app.get("/", (req, res) => res.send("API Running..."));
 

@@ -82,7 +82,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // CRUD handlers
+  // ------------------ CRUD HANDLERS -------------------
+
   const handleSeriesCreate = async (e) => {
     e.preventDefault();
     try {
@@ -207,6 +208,7 @@ export default function AdminDashboard() {
     }
   };
 
+  // ------------------ MAIN UI -------------------
   return (
     <div className="min-h-screen p-8 bg-gradient-to-r from-gray-900 to-black text-white">
       <div className="max-w-6xl mx-auto">
@@ -214,7 +216,7 @@ export default function AdminDashboard() {
 
         <div className="grid md:grid-cols-4 gap-6 mb-8">
 
-          {/* --- Series --- */}
+          {/* --- Create Series --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Series</h3>
             <form onSubmit={handleSeriesCreate} className="space-y-3">
@@ -241,12 +243,13 @@ export default function AdminDashboard() {
             </form>
           </div>
 
-          {/* --- Team --- */}
+          {/* --- Create Team --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Team / Franchise</h3>
             <form onSubmit={handleTeamCreate} className="space-y-3">
               <input value={formTeam.team_name} onChange={e=>setFormTeam({...formTeam,team_name:e.target.value})} placeholder="Team Name" className="w-full p-2 rounded bg-gray-700"/>
               <input value={formTeam.country} onChange={e=>setFormTeam({...formTeam,country:e.target.value})} placeholder="Country" className="w-full p-2 rounded bg-gray-700"/>
+              <input value={formTeam.logo_url} onChange={e=>setFormTeam({...formTeam,logo_url:e.target.value})} placeholder="Team Logo URL (https://...)" className="w-full p-2 rounded bg-gray-700"/>
 
               <select value={formTeam.gender} onChange={e=>setFormTeam({...formTeam,gender:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="male">Male</option>
@@ -264,45 +267,67 @@ export default function AdminDashboard() {
             </form>
           </div>
 
-          {/* --- Match --- */}
+          {/* --- Create Match --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Match</h3>
             <form onSubmit={handleMatchCreate} className="space-y-3">
               <select value={formMatch.series_id} onChange={e=>setFormMatch({...formMatch,series_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Select Series</option>
-                {data.series.map(s => <option key={s.series_id} value={s.series_id}>{s.name}</option>)}
+                {data.series.map((s) => (
+                  <option key={s.series_id || s.name} value={s.series_id}>{s.name}</option>
+                ))}
               </select>
 
+              {/* Team 1 */}
               <select value={formMatch.team1_id} onChange={e=>setFormMatch({...formMatch,team1_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Team 1</option>
-                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
+                {data.teams.map((t) => (
+                  <option key={t.team_id || t.name} value={t.team_id}>{t.name}</option>
+                ))}
               </select>
+              {formMatch.team1_id && (
+                <img
+                  src={data.teams.find(t => t.team_id === formMatch.team1_id)?.logo_url}
+                  alt="Team 1 Logo"
+                  className="w-12 h-12 mt-2 rounded-full object-cover mx-auto"
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+              )}
 
+              {/* Team 2 */}
               <select value={formMatch.team2_id} onChange={e=>setFormMatch({...formMatch,team2_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Team 2</option>
-                {data.teams.map(t => <option key={t.team_id} value={t.team_id}>{t.name}</option>)}
+                {data.teams.map((t) => (
+                  <option key={t.team_id || t.name + "_2"} value={t.team_id}>{t.name}</option>
+                ))}
               </select>
+              {formMatch.team2_id && (
+                <img
+                  src={data.teams.find(t => t.team_id === formMatch.team2_id)?.logo_url}
+                  alt="Team 2 Logo"
+                  className="w-12 h-12 mt-2 rounded-full object-cover mx-auto"
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+              )}
 
               <input type="date" value={formMatch.match_date} onChange={e=>setFormMatch({...formMatch,match_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
               <input type="time" value={formMatch.start_time} onChange={e=>setFormMatch({...formMatch,start_time:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
-              
+
               <button className="w-full py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded">Create Match</button>
             </form>
           </div>
 
-          {/* --- Tournament --- */}
+          {/* --- Create Tournament --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-xl mb-4">Create Tournament</h3>
             <form onSubmit={handleTournamentCreate} className="space-y-3">
               <input value={formTournament.name} onChange={e=>setFormTournament({...formTournament,name:e.target.value})} placeholder="Tournament Name" className="w-full p-2 rounded bg-gray-700"/>
-
               <select value={formTournament.type} onChange={e=>setFormTournament({...formTournament,type:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Select Type</option>
                 <option value="League">League</option>
                 <option value="Knockout">Knockout</option>
                 <option value="Bilateral">Bilateral</option>
               </select>
-
               <input type="date" value={formTournament.start_date} onChange={e=>setFormTournament({...formTournament,start_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
               <input type="date" value={formTournament.end_date} onChange={e=>setFormTournament({...formTournament,end_date:e.target.value})} className="w-full p-2 rounded bg-gray-700"/>
               <input value={formTournament.host_country} onChange={e=>setFormTournament({...formTournament,host_country:e.target.value})} placeholder="Host Country" className="w-full p-2 rounded bg-gray-700"/>
@@ -311,14 +336,18 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* --- Employee Assignment & Pending News --- */}
+        {/* --- Assign Employee & Pending News --- */}
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-2xl mb-4">Assign Employee</h3>
             <form onSubmit={handleAssign} className="space-y-3">
               <select value={assignForm.employee_id} onChange={e=>setAssignForm({...assignForm,employee_id:e.target.value})} className="w-full p-2 rounded bg-gray-700">
                 <option value="">Select Employee</option>
-                {data.employees.map(emp => <option key={emp.employee_id} value={emp.employee_id}>{emp.name} ({emp.email})</option>)}
+                {data.employees.map((emp) => (
+                  <option key={emp.employee_id || emp.email} value={emp.employee_id}>
+                    {emp.name} ({emp.email})
+                  </option>
+                ))}
               </select>
 
               <select value={assignForm.target_type} onChange={e=>setAssignForm({...assignForm,target_type:e.target.value})} className="w-full p-2 rounded bg-gray-700">
@@ -339,25 +368,26 @@ export default function AdminDashboard() {
           {/* --- Pending News --- */}
           <div className="bg-gray-800 p-6 rounded-2xl shadow">
             <h3 className="text-2xl mb-4">Pending News / Articles</h3>
-            {data.pendingNews.length ? data.pendingNews.map(n => (
-              <div key={n.news_id} className="bg-gray-700 p-3 rounded mb-3">
-                <h4 className="font-semibold">{n.title}</h4>
-                <p className="text-sm text-gray-300 my-2">{n.content?.slice(0,200)}{n.content?.length > 200 ? "..." : ""}</p>
-                <div className="flex gap-2">
-                  <button onClick={()=>approveNews(n.news_id)} className="px-3 py-1 bg-green-600 rounded">Approve</button>
-                  <button onClick={()=>rejectNews(n.news_id)} className="px-3 py-1 bg-red-600 rounded">Reject</button>
+            {data.pendingNews.length ? (
+              data.pendingNews.map((n) => (
+                <div key={n.news_id || n.title} className="bg-gray-700 p-3 rounded mb-3">
+                  <h4 className="font-semibold">{n.title}</h4>
+                  <p className="text-sm text-gray-300 my-2">
+                    {n.content?.slice(0,200)}{n.content?.length > 200 ? "..." : ""}
+                  </p>
+                  <div className="flex gap-2">
+                    <button onClick={()=>approveNews(n.news_id)} className="px-3 py-1 bg-green-600 rounded">Approve</button>
+                    <button onClick={()=>rejectNews(n.news_id)} className="px-3 py-1 bg-red-600 rounded">Reject</button>
+                  </div>
                 </div>
-              </div>
-            )) : <p className="text-gray-400">No pending articles</p>}
+              ))
+            ) : (
+              <p className="text-gray-400">No pending articles</p>
+            )}
           </div>
         </div>
 
-        {/* --- Manage Buttons --- */}
-        <div className="mt-8 text-center">
-          <button onClick={()=>navigate("/manage-teams")} className="mr-4 px-4 py-2 bg-purple-600 rounded">Manage Teams</button>
-          <button onClick={()=>navigate("/manage-players")} className="mr-4 px-4 py-2 bg-blue-600 rounded">Manage Players</button>
-          <button onClick={()=>navigate("/manage-matches")} className="mr-4 px-4 py-2 bg-yellow-600 rounded">Manage Matches</button>
-        </div>
+
       </div>
     </div>
   );

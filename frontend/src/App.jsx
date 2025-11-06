@@ -14,11 +14,11 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import HomePage from "./pages/HomePage";
 import SeriesPage from "./pages/SeriesPage";
 import MatchesPage from "./pages/MatchesPage";
-import TournamentsPage from "./pages/TournamentsPage";
 import RankingsPage from "./pages/RankingsPage";
 import NewsPage from "./pages/NewsPage";
 import ProfilePage from "./pages/ProfilePage";
-
+import SeriesDetails from "./pages/SeriesDetail";
+import MatchDetails from "./pages/MatchDetails";
 // 🔹 Components
 import Header from "./components/Header";
 
@@ -34,10 +34,11 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/series" element={<SeriesPage />} />
           <Route path="/matches" element={<MatchesPage />} />
-          <Route path="/tournaments" element={<TournamentsPage />} />
           <Route path="/rankings" element={<RankingsPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/series/:id" element={<SeriesDetails />} />
+          <Route path="/matches/:id" element={<MatchDetails />} />
 
           {/* Auth Pages */}
           <Route path="/register" element={<Register />} />
