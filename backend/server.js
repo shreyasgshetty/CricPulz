@@ -33,6 +33,9 @@ app.use("/api/rankings", rankingRoutes);
 const newsRoutes = require("./routes/News")(pool);
 app.use("/api/news", newsRoutes);
 
+const matchDetailsRoutes = require("./routes/MatchDetails")(pool);
+app.use("/api/match", matchDetailsRoutes);
+
 app.get("/", (req, res) => res.send("API Running..."));
 
 const PORT = process.env.PORT || 5003;
