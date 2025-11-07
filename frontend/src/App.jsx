@@ -9,7 +9,7 @@ import EmployeeLogin from "./pages/auth/EmployeeLogin";
 
 // 🔹 Dashboard Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
-
+import AdminManage from "./pages/admin/AdminManage";
 // 🔹 Public Pages
 import HomePage from "./pages/HomePage";
 import SeriesPage from "./pages/SeriesPage";
@@ -19,6 +19,9 @@ import NewsPage from "./pages/NewsPage";
 import ProfilePage from "./pages/ProfilePage";
 import SeriesDetails from "./pages/SeriesDetail";
 import MatchDetails from "./pages/MatchDetails";
+import AdminManageLayout from "./pages/admin/AdminManageLayout";
+import AdminManageTeams from "./pages/admin/AdminManageTeams";
+import AdminManageMatches from "./pages/admin/AdminManageMatches";
 // 🔹 Components
 import Header from "./components/Header";
 
@@ -48,6 +51,11 @@ function App() {
 
           {/* Dashboards */}
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/manage" element={<AdminManageLayout />}>
+  <Route path="series" element={<AdminManage />} />
+  <Route path="teams" element={<AdminManageTeams />} />
+  <Route path="matches" element={<AdminManageMatches />} />
+</Route>
         </Routes>
       </main>
     </BrowserRouter>

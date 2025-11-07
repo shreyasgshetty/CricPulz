@@ -526,7 +526,16 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
+          
         </div>
+        <button
+  type="button"
+  onClick={() => navigate("/admin/manage/series")}
+  className="w-full mt-3 py-2.5 px-4 rounded-md font-semibold text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-colors duration-150 flex items-center justify-center gap-2"
+>
+  <FiGrid /> Manage Series, Matches & Teams 
+</button>
+
       </div>
     </div>
   );

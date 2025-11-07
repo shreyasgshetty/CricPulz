@@ -50,20 +50,34 @@ module.exports = (pool) => {
     }
   });
 
-  router.put("/series/:id", async (req, res) => {
-    try {
-      const id = req.params.id;
-      const { name, format, type, start_date, end_date, host_country } = req.body;
-      await pool.query(
-        "UPDATE series SET name=?, format=?, type=?, start_date=?, end_date=?, host_country=? WHERE series_id=?",
-        [name, format, type, start_date || null, end_date || null, host_country, id]
-      );
-      res.json({ message: "Series updated" });
-    } catch (err) {
-      console.error("Update series error:", err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
+router.put("/series/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    let { name, format, type, start_date, end_date, host_country } = req.body;
+
+    // 🧩 Convert ISO date strings (like 2025-11-21T18:30:00.000Z) to YYYY-MM-DD
+    const toDateOnly = (d) => {
+      if (!d) return null;
+      const date = new Date(d);
+      if (isNaN(date)) return null; // Invalid date safeguard
+      return date.toISOString().split("T")[0]; // returns YYYY-MM-DD
+    };
+
+    start_date = toDateOnly(start_date);
+    end_date = toDateOnly(end_date);
+
+    await pool.query(
+      "UPDATE series SET name=?, format=?, type=?, start_date=?, end_date=?, host_country=? WHERE series_id=?",
+      [name, format, type, start_date, end_date, host_country, id]
+    );
+
+    res.json({ message: "Series updated successfully" });
+  } catch (err) {
+    console.error("Update series error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
   router.delete("/series/:id", async (req, res) => {
     try {
@@ -74,6 +88,17 @@ module.exports = (pool) => {
       res.status(500).json({ message: "Server error" });
     }
   });
+  // 🟦 Get all series (Admin)
+router.get("/series", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM series ORDER BY start_date DESC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Fetch series error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
   // ================= TEAM CRUD =================
 router.post("/team", async (req, res) => {
@@ -112,6 +137,28 @@ router.post("/team", async (req, res) => {
     }
   });
 
+  //  Get all teams
+router.get("/team", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM teams ORDER BY name ASC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Fetch teams error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+//  Delete team
+router.delete("/team/:id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM teams WHERE team_id=?", [req.params.id]);
+    res.json({ message: "Team deleted" });
+  } catch (err) {
+    console.error("Delete team error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
   // ================= MATCH CRUD =================
   router.post("/match", async (req, res) => {
     try {
@@ -147,6 +194,48 @@ router.post("/team", async (req, res) => {
     }
   });
 
+  // 🟦 Get all matches with details
+router.get("/match", async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT 
+        m.match_id,
+        m.series_id,
+        s.name AS series_name,
+        m.team1_id,
+        t1.name AS team1_name,
+        t1.logo_url AS team1_logo,
+        m.team2_id,
+        t2.name AS team2_name,
+        t2.logo_url AS team2_logo,
+        m.venue_id,
+        v.venue_name AS venue_name,
+        m.match_date,
+        m.winner_team_id
+      FROM \`match\` m
+      LEFT JOIN series s ON m.series_id = s.series_id
+      LEFT JOIN teams t1 ON m.team1_id = t1.team_id
+      LEFT JOIN teams t2 ON m.team2_id = t2.team_id
+      LEFT JOIN venue v ON m.venue_id = v.venue_id
+      ORDER BY m.match_date DESC
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Fetch matches error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+// 🟥 Delete match
+router.delete("/match/:id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM `match` WHERE match_id = ?", [req.params.id]);
+    res.json({ message: "Match deleted successfully" });
+  } catch (err) {
+    console.error("Delete match error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
   // ================= ASSIGN EMPLOYEE =================
 router.post("/assign", async (req, res) => {
   try {
