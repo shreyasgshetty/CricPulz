@@ -277,5 +277,15 @@ router.post("/assign", async (req, res) => {
     }
   });
 
+  router.get("/venues", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT venue_id, venue_name, city FROM venue");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching venues:", err);
+    res.status(500).json({ message: "Server error fetching venues" });
+  }
+});
+
   return router;
 };

@@ -1,58 +1,99 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { FiLogIn, FiUser, FiLock } from "react-icons/fi";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // --- Base Styling Classes ---
+  const labelStyle = "block text-sm font-medium text-slate-300 mb-1";
+  const inputStyle =
+    "w-full pl-10 pr-3 py-2.5 rounded-md bg-slate-700 border border-slate-600 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150";
+  const buttonStyle =
+    "w-full py-2.5 px-4 rounded-md font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-colors duration-150 flex items-center justify-center gap-2";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
     try {
       const res = await axios.post("http://localhost:5003/api/auth/login", form);
       localStorage.setItem("token", res.data.token);
-      alert("✅ Login successful!");
-      navigate("/");
+      toast.success("✅ Login successful! Redirecting...");
+      navigate("/"); // Navigate to home or dashboard
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-r from-blue-900 to-gray-900 ">
-      <div className="bg-gray-800 p-10 rounded-3xl shadow-2xl w-96">
-        <h1 className="text-3xl font-extrabold mb-8 text-center text-gradient bg-gradient-to-r from-blue-400 via-gray-500 to-purple-700 bg-clip-text text-transparent">
-          Welcome Back
+    <div className="min-h-screen flex justify-center items-center bg-slate-900 p-4">
+      <div className="bg-slate-800 border border-slate-700 p-8 rounded-lg shadow-lg w-full max-w-md">
+        
+        <h1 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+          <FiLogIn /> Welcome Back
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-4 bg-gray-700 placeholder-gray-400 text-white rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-4 bg-gray-700 placeholder-gray-400 text-white rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Input */}
+          <div>
+            <label htmlFor="email" className={labelStyle}>Email</label>
+            <div className="relative">
+              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+                className={inputStyle}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          {/* Password Input */}
+          <div>
+            <label htmlFor="password" className={labelStyle}>Password</label>
+            <div className="relative">
+              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                className={inputStyle}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-800 to-blue-500 text-white font-bold hover:from-purple-500 hover:to-blue-500 transition-all duration-300 shadow-lg"
+            disabled={loading}
+            className={`${buttonStyle} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        <p className="text-center text-gray-400 mt-6">
+
+        <p className="text-center text-slate-400 mt-6 text-sm">
           Don't have an account?{" "}
-          <span
-            className="text-purple-400 hover:text-purple-300 cursor-pointer"
-            onClick={() => navigate("/register")}
+          <Link
+            to="/register"
+            className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
           >
             Register
-          </span>
+          </Link>
         </p>
+
       </div>
     </div>
   );

@@ -1,12 +1,21 @@
 const express = require("express");
 const mysql = require("mysql2/promise"); // promise version
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 // Create MySQL pool **first**
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
@@ -14,6 +23,7 @@ const pool = mysql.createPool({
   password: process.env.DB_PASS || "mypassword",
   database: process.env.DB_NAME || "cricpulz"
 });
+
 
 // Then pass pool to auth routes
 const authRoutes = require("./routes/auth")(pool);
@@ -35,6 +45,9 @@ app.use("/api/news", newsRoutes);
 
 const matchDetailsRoutes = require("./routes/MatchDetails")(pool);
 app.use("/api/match", matchDetailsRoutes);
+
+const userRoutes = require("./routes/User")(pool);
+app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => res.send("API Running..."));
 

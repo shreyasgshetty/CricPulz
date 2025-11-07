@@ -1,58 +1,99 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { FiShield, FiLock, FiMail } from "react-icons/fi";
 
 export default function AdminLogin() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // --- Base Styling Classes (consistent with Login.jsx) ---
+  const labelStyle = "block text-sm font-medium text-slate-300 mb-1";
+  const inputStyle =
+    "w-full pl-10 pr-3 py-2.5 rounded-md bg-slate-700 border border-slate-600 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150";
+  const buttonStyle =
+    "w-full py-2.5 px-4 rounded-md font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-colors duration-150 flex items-center justify-center gap-2";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
     try {
       const res = await axios.post("http://localhost:5003/api/auth/admin-login", form);
       localStorage.setItem("adminToken", res.data.token);
-      alert("✅ Admin login successful!");
+      toast.success("✅ Admin login successful!");
       navigate("/admin-dashboard"); // redirect to admin area
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed. Check credentials.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-r from-red-900 to-black">
-      <div className="bg-gray-800 p-10 rounded-3xl shadow-2xl w-96">
-        <h1 className="text-3xl font-extrabold mb-8 text-center bg-gradient-to-r from-red-500 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
-          Admin Panel Login
+    <div className="min-h-screen flex justify-center items-center bg-slate-900 p-4">
+      <div className="bg-slate-800 border border-slate-700 p-8 rounded-lg shadow-lg w-full max-w-md">
+        
+        <h1 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+          <FiShield /> Admin Panel
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <input
-            type="email"
-            placeholder="Admin Email"
-            className="w-full p-4 bg-gray-700 placeholder-gray-400 text-white rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-4 bg-gray-700 placeholder-gray-400 text-white rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-          />
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email Input */}
+          <div>
+            <label htmlFor="email" className={labelStyle}>Admin Email</label>
+            <div className="relative">
+              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                required
+                className={inputStyle}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          {/* Password Input */}
+          <div>
+            <label htmlFor="password" className={labelStyle}>Password</label>
+            <div className="relative">
+              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                className={inputStyle}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+            </div>
+          </div>
+          
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold hover:from-orange-600 hover:to-red-600 transition-all duration-300 shadow-lg"
+            disabled={loading}
+            className={`${buttonStyle} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Login as Admin
+            {loading ? "Logging in..." : "Login as Admin"}
           </button>
         </form>
-        <p className="text-center text-gray-400 mt-6">
+
+        <p className="text-center text-slate-400 mt-6 text-sm">
           Not an Admin?{" "}
-          <span
-            className="text-red-400 hover:text-red-300 cursor-pointer"
-            onClick={() => navigate("/login")}
+          <Link
+            to="/login"
+            className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
           >
             Go Back
-          </span>
+          </Link>
         </p>
+
       </div>
     </div>
   );

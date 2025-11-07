@@ -24,24 +24,43 @@ module.exports = (pool) => {
   });
 
   // LOGIN
-  router.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
       const { email, password } = req.body;
-      const [rows] = await pool.query("SELECT * FROM User WHERE email = ?", [email]);
+      const [rows] = await pool.query("SELECT * FROM user WHERE email = ?", [email]);
 
-      if (rows.length === 0) return res.status(400).json({ message: "User not found" });
+      if (rows.length === 0)
+        return res.status(400).json({ message: "User not found" });
 
       const user = rows[0];
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+      if (!isMatch)
+        return res.status(400).json({ message: "Invalid password" });
 
-      const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-      res.json({ message: "Login successful", token });
+      // ✅ Create JWT
+      const token = jwt.sign({ id: user.user_id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      // ✅ (Optional but Recommended) Send as HTTP-only cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false, // change to true if using HTTPS
+        sameSite: "Lax",
+        maxAge: 60 * 60 * 1000, // 1 hour
+      });
+
+      res.json({
+        message: "Login successful",
+        token, // include if your frontend stores it in localStorage
+        user: { id: user.user_id, name: user.name, email: user.email },
+      });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Server error" });
+      console.error("Login error:", err);
+      res.status(500).json({ message: "Server error during login" });
     }
   });
+
 
   // ADMIN LOGIN
 router.post("/admin-login", async (req, res) => {
@@ -101,6 +120,12 @@ router.post("/employee-login", async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+// ✅ Logout Route
+router.post("/logout", (req, res) => {
+  res.clearCookie("token"); // if you set cookie-based token
+  return res.json({ message: "Logged out successfully" });
 });
 
 
